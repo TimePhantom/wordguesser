@@ -1,0 +1,31 @@
+name: CI
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    #- uses: actions/checkout@v1
+    - name: Ensure Docker is installed
+      run: |
+        docker version
+        docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - name: Run a multi-line script
+      run: |
+        docker build --pull -t $CONTAINER_TEST_IMAGE .
+        docker push $CONTAINER_TEST_IMAGE 
+        
+  #static_analysis:
+  #lint_dockerfile:
+    #stage: hadolint
+    #image: hadolint/hadolint:latest-debian
+    #before_script:
+    #  - hadolint --version
+    #script:
+    #  - hadolint backend/Dockerfile
+    #  - hadolint --ignore DL3007 mysql/Dockerfile
+    #  - hadolint natl-frontend/Dockerfile
+    #  - hadolint --ignore DL3013 tests/Dockerfile
+  #unit_test:
+  #integration_test:
+  #deploy:

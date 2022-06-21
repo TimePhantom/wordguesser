@@ -79,4 +79,3 @@ jobs:
           heroku_app_name: "wordguesser-test"
           heroku_email: ${{secrets.HEROKU_USERNAME}}
           usedocker: true
-          procfile: "web: bundle exec rackup config.ru -p $PORT"

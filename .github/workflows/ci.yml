@@ -68,5 +68,4 @@ jobs:
           rspec
       - name: Integration tests
         run: cucumber
-  #integration_test:
   #deploy:

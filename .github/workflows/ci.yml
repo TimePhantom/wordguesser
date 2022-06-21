@@ -38,15 +38,12 @@ jobs:
         
   #static_analysis:
   lint_dockerfile:
-    stage: hadolint
-    image: hadolint/hadolint:latest-debian
-    before_script:
-      - hadolint --version
-    script:
-      - hadolint backend/Dockerfile
-      - hadolint --ignore DL3007 mysql/Dockerfile
-      - hadolint natl-frontend/Dockerfile
-      - hadolint --ignore DL3013 tests/Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 
+      - uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: Dockerfile
   #unit_test:
   #integration_test:
   #deploy:

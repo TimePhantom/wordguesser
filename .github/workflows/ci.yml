@@ -62,8 +62,19 @@ jobs:
           ruby-version: '2.6.6'
       - name: Install dependencies
         run: bundle install
-      - name: Integration tests
-        run: cucumber
-      - name: Unit tests
+      - name: Unit tests (rspec)
         run: rspec
-  #deploy:
+      - name: Integration tests (cucmber)
+        run: cucumber
+  
+  deploy: # https://github.com/marketplace/actions/deploy-to-heroku
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "wordguesser-test"
+          heroku_email: ${{secrets.HEROKU_USERNAME}}
+          usedocker: true
+  

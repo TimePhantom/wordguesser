@@ -43,7 +43,7 @@ jobs:
           reporter: github-pr-review # Default is github-pr-check
   
   lint_dockerfile: # https://github.com/marketplace/actions/hadolint-action
-    name: Hadolint (Docker file linter)
+    name: Hadolint (Dockerfile linter)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 
@@ -62,8 +62,8 @@ jobs:
           ruby-version: '2.6.6'
       - name: Install dependencies
         run: bundle install
-      - name: Unit tests
-        run: bundle rspec
       - name: Integration tests
         run: cucumber
+      - name: Unit tests
+        run: rspec
   #deploy:

@@ -68,6 +68,7 @@ jobs:
         run: cucumber
   
   deploy: # https://github.com/marketplace/actions/deploy-to-heroku
+    name: Deploy to Heroku
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -77,4 +78,4 @@ jobs:
           heroku_app_name: "wordguesser-test"
           heroku_email: ${{secrets.HEROKU_USERNAME}}
           usedocker: true
-  
+          procfile: "web: bundle exec rackup config.ru -p $PORT"

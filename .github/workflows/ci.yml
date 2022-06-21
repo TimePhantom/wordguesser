@@ -27,7 +27,7 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:latest 
         
   static_analysis: # https://github.com/reviewdog/action-rubocop
-    name: Rubocop
+    name: Rubocop (Ruby linter)
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -43,7 +43,7 @@ jobs:
           reporter: github-pr-review # Default is github-pr-check
   
   lint_dockerfile: # https://github.com/marketplace/actions/hadolint-action
-    name: Hadolint
+    name: Hadolint (Docker file linter)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 
@@ -52,7 +52,7 @@ jobs:
           dockerfile: Dockerfile
   
   test: # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-ruby
-    name: Tests
+    name: Tests (rspec and cucumber)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -63,9 +63,7 @@ jobs:
       - name: Install dependencies
         run: bundle install
       - name: Unit tests
-        run: |
-          bundle exec rake
-          rspec
+        run: bundle rspec
       - name: Integration tests
         run: cucumber
   #deploy:

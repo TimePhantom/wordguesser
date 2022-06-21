@@ -1,0 +1,92 @@
+name: CI
+on: [push]
+
+jobs:
+  build: # https://github.com/marketplace/actions/build-and-push-docker-images
+    name: Build with CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      # required for all workflows
+      security-events: write
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
+    services:
+      docker:
+        image: docker:dind
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
+      - name: Initialize CodeQL # https://github.com/github/codeql-action
+        uses: github/codeql-action/init@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:latest
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        
+  static_analysis: # https://github.com/reviewdog/action-rubocop
+    name: Rubocop (Ruby linter)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.0
+      - name: rubocop
+        uses: reviewdog/action-rubocop@v2
+        with:
+          rubocop_version: gemfile
+          rubocop_extensions: rubocop-rails:gemfile rubocop-rspec:gemfile
+          reporter: github-pr-review # Default is github-pr-check
+  
+  lint_dockerfile: # https://github.com/marketplace/actions/hadolint-action
+    name: Hadolint (Dockerfile linter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 
+      - uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3025
+          #no-fail: true
+  
+  test: # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-ruby
+    name: Tests (rspec and cucumber)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
+        with:
+          ruby-version: '2.6.6'
+      - name: Install dependencies
+        run: bundle install
+      - name: Unit tests (rspec)
+        run: rspec
+      - name: Integration tests (cucmber)
+        run: cucumber
+  
+  deploy: # https://github.com/marketplace/actions/deploy-to-heroku
+    name: Deploy to Heroku
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "wordguesser-test"
+          heroku_email: ${{secrets.HEROKU_USERNAME}}
+          usedocker: true

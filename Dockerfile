@@ -1,6 +1,6 @@
 FROM ruby:2.6.6
 
-ADD . /wordguesser
+COPY . /wordguesser
 WORKDIR /wordguesser
 RUN bundle install
 
@@ -12,4 +12,5 @@ RUN useradd -m myuser
 USER myuser
 
 # execution list precludes use of variable
-CMD bundle exec rackup --host 0.0.0.0 --port $PORT
+#CMD ["bundle", "exec", "rackup", "-o", "0.0.0.0", "-p", "$PORT"]
+CMD bundle exec rackup -o 0.0.0.0 -p $PORT
